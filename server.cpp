@@ -195,8 +195,7 @@ int main(int argc, char *argv[]) {
 					// A venit ceva pe socketul inactiv(cel cu listen) = o noua conexiune
 					// Actiunea serverului: accept()
 					clilen = sizeof(cli_addr);
-					if ((newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr,
-																											&clilen)) == -1) {
+					if ((newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen)) == -1) {
 						printf("-10 : Eroare la apelul accept\n");
 						exit(5);
 					} else {
@@ -391,7 +390,8 @@ int main(int argc, char *argv[]) {
 									// Cand e prima oara cand se introduce pinul gresit pentru
 									// acest card de pe acest client.
 									if (incercari_client == verificare_login.end() ||
-														incercari_client->second.numar_card != numar_card) {
+										incercari_client->second.numar_card != numar_card) {
+										
 										Incercari_card aux;
 										aux.numar_card = numar_card;
 										aux.contor_blocare = 1;
@@ -427,7 +427,7 @@ int main(int argc, char *argv[]) {
 
 									mesaj = "IBANK> Welcome ";
 									mesaj += exista_card->second.nume + " "
-																				+ exista_card->second.prenume;
+									         + exista_card->second.prenume;
 
 									memset(buffer, 0, BUFLEN);
 									strcpy(buffer, mesaj.c_str());
@@ -470,7 +470,7 @@ int main(int argc, char *argv[]) {
 							}
 							// Se elimina socketul din socketii activi.
 							conexiuni_clienti.erase(remove(conexiuni_clienti.begin(),
-													conexiuni_clienti.end(), i), conexiuni_clienti.end());
+							              conexiuni_clienti.end(), i), conexiuni_clienti.end());
 							printf("Clientul de pe socket-ul %d a iesit\n", i);
 							close(i);
 							FD_CLR(i, &read_fds);
@@ -533,7 +533,7 @@ int main(int argc, char *argv[]) {
 
 										mesaj = "IBANK> Transfer ";
 										mesaj += stream.str() + " catre " + exista_card->second.nume
-																+ " " + exista_card->second.prenume + "? [y/n]";
+											 + " " + exista_card->second.prenume + "? [y/n]";
 										memset(buffer, 0, BUFLEN);
 										strcpy(buffer, mesaj.c_str());
 										n = send(i, buffer, BUFLEN, 0);
