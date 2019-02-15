@@ -66,13 +66,11 @@ typedef struct {
 } Cerere_transfer;
 
 // Functie pentru incarcarea datelor din fisier in memorie.
-void incarcare_informatii(string fisier,int &nr_useri,
-													unordered_map<string, User> &data_users) {
-
+void incarcare_informatii(string fisier,int &nr_useri, unordered_map<string, User> &data_users) {
 	ifstream fin(fisier);
 	if (!fin.is_open()) {
 		printf("-10 : Eroare la apelul de deschidere a fisierului users_data_file\n");
-    	exit(4);
+    		exit(4);
 	}
 
 	fin >> nr_useri;
@@ -155,10 +153,10 @@ int main(int argc, char *argv[]) {
 
 	// Mai sus s-a realizat conexiunea TCP. Acum se realizeaza conexiunea UDP.
 	sockudp = socket(AF_INET, SOCK_DGRAM, 0);
-    if (sockudp < 0) {
+    	if (sockudp < 0) {
 			printf("-10 : Eroare la apelul socket(UDP)\n");
 			exit(2);
-    }
+   	}
 
 	memset((char *) &server_addr_udp, 0, sizeof(server_addr_udp));
 	/* Se seteaza familia de adrese socket-ului. */
@@ -170,8 +168,7 @@ int main(int argc, char *argv[]) {
 
 	/* Legare proprietati de socket. */
 	/* Parametrii: socket, adresa socket-ului meu, marimea socket-ului. */
-	if (bind(sockudp, (struct sockaddr *) &server_addr_udp,
-											sizeof(server_addr_udp)) < 0) {
+	if (bind(sockudp, (struct sockaddr *) &server_addr_udp, sizeof(server_addr_udp)) < 0) {
 		printf("-10 : Eroare la apelul bind(UDP)\n");
 		exit(3);
 	}
@@ -213,8 +210,8 @@ int main(int argc, char *argv[]) {
 					printf("Noua conexiune de la %s, port %d, socket_client %d\n",
 					inet_ntoa(cli_addr.sin_addr), ntohs(cli_addr.sin_port), newsockfd);
 
-					// Cazul cand se citesc date de la STDIN.
-        } else if (i == 0) {
+				// Cazul cand se citesc date de la STDIN.
+        			} else if (i == 0) {
 					cin >> bufer;
 					if (bufer != "quit") {
 						printf("Comanda incorecta. Comanda valida: \"quit\"\n");
@@ -224,11 +221,11 @@ int main(int argc, char *argv[]) {
 
 						// Se trimite tuturor clientilor faptul ca o sa se inchida serverul.
 						for (unsigned int j = 0; j < conexiuni_clienti.size(); j++) {
-	           	n = send(conexiuni_clienti[j], buffer, BUFLEN, 0);
-            	if (n < 0) {
-              	cout << "-10 : Eroare la apel send" << endl;
+	           					n = send(conexiuni_clienti[j], buffer, BUFLEN, 0);
+            						if (n < 0) {
+              							cout << "-10 : Eroare la apel send" << endl;
 								exit(6);
-            	}
+            						}
 						}
 						// Se inchid conexiunile.
 						for (unsigned int j = 0; j < conexiuni_clienti.size(); j++) {
@@ -242,11 +239,10 @@ int main(int argc, char *argv[]) {
 						return 0;
 					}
 
-					// Cazul cand se primesc date pe UDP.
+				// Cazul cand se primesc date pe UDP.
 				} else if (i == sockudp) {
 					socklen_t slen = sizeof(client_addr_udp);
-					n = recvfrom(sockudp, buffer, BUFLEN, 0,
-											(struct sockaddr *) &client_addr_udp, &slen);
+					n = recvfrom(sockudp, buffer, BUFLEN, 0, (struct sockaddr *) &client_addr_udp, &slen);
 					if (n < 0) {
 						printf("-10 : Eroare la apelul recvfrom\n");
 						exit(6);
@@ -261,38 +257,38 @@ int main(int argc, char *argv[]) {
 						// Cazul cand cardul nu exista.
 						if (exista_card == data_users.end()) {
 							n = sendto(i, "UNLOCK> -4 : Numar card inexistent", BUFLEN, 0,
-																		(struct sockaddr *) &client_addr_udp, slen);
+								  (struct sockaddr *) &client_addr_udp, slen);
 							if (n < 0) {
 								cout << "-10 : Eroare la apel sendto" << endl;
 								exit(6);
 							}
-							// Cazul cand cardul nu este blocat.
+						// Cazul cand cardul nu este blocat.
 						} else if (!exista_card->second.blocat) {
 							n = sendto(i, "UNLOCK> -6 : Operatie esuata", BUFLEN, 0,
-																		(struct sockaddr *) &client_addr_udp, slen);
+								  (struct sockaddr *) &client_addr_udp, slen);
 							if (n < 0) {
 								cout << "-10 : Eroare la apel sendto" << endl;
 								exit(6);
 							}
-							// Cazul cand cineva deja incearca sa deblocheze cardul.
+						// Cazul cand cineva deja incearca sa deblocheze cardul.
 						} else if (exista_card->second.deblocare_inceputa) {
 							n = sendto(i, "UNLOCK> -7 : Deblocare esuata", BUFLEN, 0,
-																		(struct sockaddr *) &client_addr_udp, slen);
+								  (struct sockaddr *) &client_addr_udp, slen);
 							if (n < 0) {
 								cout << "-10 : Eroare la apel sendto" << endl;
 								exit(6);
 							}
-							// Cazul cand se incepe deblocarea si se cere parola.
+						// Cazul cand se incepe deblocarea si se cere parola.
 						} else {
 							exista_card->second.deblocare_inceputa = true;
 							n = sendto(i, "UNLOCK> Trimite parola secreta", BUFLEN, 0,
-																		(struct sockaddr *) &client_addr_udp, slen);
+								  (struct sockaddr *) &client_addr_udp, slen);
 							if (n < 0) {
 								cout << "-10 : Eroare la apel sendto" << endl;
 								exit(6);
 							}
 						}
-						// Cazul cand se primeste parola secreta (si numarul cardului).
+					// Cazul cand se primeste parola secreta (si numarul cardului).
 					} else {
 						string numar_card = bufer.substr(0,6);
 						auto exista_card = data_users.find(numar_card);
@@ -300,28 +296,28 @@ int main(int argc, char *argv[]) {
 						// dar se verifica pentru orice eventualitate existenta cardului.
 						if (exista_card == data_users.end()) {
 							n = sendto(i, "UNLOCK> -4 : Numar card inexistent", BUFLEN, 0,
-																		(struct sockaddr *)&client_addr_udp, slen);
+							          (struct sockaddr *)&client_addr_udp, slen);
 							if (n < 0) {
 								cout << "-10 : Eroare la apel sendto" << endl;
 								exit(6);
 							}
-							// Cazul cand cardul exista si parola este corecta.
+						// Cazul cand cardul exista si parola este corecta.
 						} else if(exista_card->second.parola_secreta ==
-																					bufer.substr(7, bufer.length() - 7)){
+							  bufer.substr(7, bufer.length() - 7)){
 
 							exista_card->second.blocat = false;
 							exista_card->second.deblocare_inceputa = false;
 							n = sendto(i, "UNLOCK> Card deblocat", BUFLEN, 0,
-																		(struct sockaddr *)&client_addr_udp, slen);
+								  (struct sockaddr *)&client_addr_udp, slen);
 							if (n < 0) {
 								cout << "-10 : Eroare la apel sendto" << endl;
 								exit(6);
 							}
-							// Cazul cand parola este incorecta.
+						// Cazul cand parola este incorecta.
 						} else {
 							exista_card->second.deblocare_inceputa = false;
 							n = sendto(i, "UNLOCK> -7 : Deblocare esuata", BUFLEN, 0,
-																		(struct sockaddr *)&client_addr_udp, slen);
+								  (struct sockaddr *)&client_addr_udp, slen);
 							if (n < 0) {
 								cout << "-10 : Eroare la apel sendto" << endl;
 								exit(6);
@@ -329,8 +325,8 @@ int main(int argc, char *argv[]) {
 						}
 					}
 
-					// Cazul cand se primesc date pe una din conexiunile TCP prin care
-					// serverul comunica cu un anume client.
+				// Cazul cand se primesc date pe una din conexiunile TCP prin care
+				// serverul comunica cu un anume client.
 				} else {
 					memset(buffer, 0, BUFLEN);
 					if ((n = recv(i, buffer, sizeof(buffer), 0)) <= 0) {
@@ -342,11 +338,11 @@ int main(int argc, char *argv[]) {
 						}
 						// Se elimina socket-ul din multimea socketilor "activi".
 						conexiuni_clienti.erase(remove(conexiuni_clienti.begin(),
-													conexiuni_clienti.end(), i), conexiuni_clienti.end());
+								 conexiuni_clienti.end(), i), conexiuni_clienti.end());
 						close(i);
 						FD_CLR(i, &read_fds);
 
-						// Cazul cand recv intoarce > 0.
+					// Cazul cand recv intoarce > 0.
 					} else {
 						string bufer(buffer);
 
@@ -369,24 +365,24 @@ int main(int argc, char *argv[]) {
 							if (exista_card == data_users.end()) {
 								n = send(i, "IBANK> -4 : Numar card inexistent", BUFLEN, 0);
 								if (n < 0) {
-                  cout << "-10 : Eroare la apel send" << endl;
+                  							cout << "-10 : Eroare la apel send" << endl;
 									exit(6);
-                }
-								//Cardul exista dar e deja o sesiune pe el.
+                						}
+							//Cardul exista dar e deja o sesiune pe el.
 							} else if(exista_card->second.sock != -1) {
 								n = send(i, "IBANK> -2 : Sesiune deja deschisa", BUFLEN, 0);
 								if (n < 0) {
 									cout << "-10 : Eroare la apel send" << endl;
 									exit(6);
 								}
-								 // Se verifica daca cardul este blocat.
+							// Se verifica daca cardul este blocat.
 							} else if(exista_card->second.blocat) {
 								n = send(i, "IBANK> -5 : Card blocat", BUFLEN, 0);
 								if (n < 0) {
 									cout << "-10 : Eroare la apel send" << endl;
 									exit(6);
 								}
-								// Se verifica pinul.
+							// Se verifica pinul.
 							} else {
 								// Cazul cand pinul este gresit.
 								if (pin != exista_card->second.pin) {
@@ -401,7 +397,7 @@ int main(int argc, char *argv[]) {
 										aux.contor_blocare = 1;
 										verificare_login[i] = aux;
 
-										// Cazul cand deja mai fusese introdus pinul gresit.
+									// Cazul cand deja mai fusese introdus pinul gresit.
 									} else {
 										incercari_client->second.contor_blocare++;
 										if(incercari_client->second.contor_blocare >= 3) {
@@ -420,7 +416,7 @@ int main(int argc, char *argv[]) {
 										cout << "-10 : Eroare la apel send" << endl;
 										exit(6);
 									}
-									// Cazul cand pinul este corect si cardul nu e blocat.
+								// Cazul cand pinul este corect si cardul nu e blocat.
 								} else {
 									auto incercari_client = verificare_login.find(i);
 									if (incercari_client != verificare_login.end()) {
@@ -443,7 +439,7 @@ int main(int argc, char *argv[]) {
 								}
 							}
 
-							// Cazul cand se primeste comanda "logout".
+						// Cazul cand se primeste comanda "logout".
 						} else if (bufer.substr(0,6) == "logout") {
 							auto client_card = sock_nrCard.find(i);
 							if (client_card != sock_nrCard.end()) {
@@ -454,14 +450,14 @@ int main(int argc, char *argv[]) {
 									cout << "-10 : Eroare la apel send" << endl;
 									exit(6);
 								}
-								// Cazul asta nu ar trebui sa se intample niciodata, pentru
-								// ca se verifica sa fie logat in client, dar pentru orice
-								// eventualitate.
+							// Cazul asta nu ar trebui sa se intample niciodata, pentru
+							// ca se verifica sa fie logat in client, dar pentru orice
+							// eventualitate.
 							} else {
 								cout << "-10 : Eroare la apel logout(nu s-a gasit clientul pentru delogare)" << endl;
 							}
 
-							// Cazul cand se primeste comanda "quit".
+						// Cazul cand se primeste comanda "quit".
 						} else if (bufer.substr(0,4) == "quit") {
 							auto incercari_client = verificare_login.find(i);
 							if (incercari_client != verificare_login.end()) {
@@ -479,7 +475,7 @@ int main(int argc, char *argv[]) {
 							close(i);
 							FD_CLR(i, &read_fds);
 
-							// Cazul cand se primeste comanda "listsold".
+						// Cazul cand se primeste comanda "listsold".
 						} else if (bufer.substr(0,8) == "listsold") {
 							auto client_card = sock_nrCard.find(i);
 							// Se verifica ca clientul sa fie conectat la un cont.
@@ -501,7 +497,7 @@ int main(int argc, char *argv[]) {
 								}
 							}
 
-							// Cazul cand se primeste comanda "transfer".
+						// Cazul cand se primeste comanda "transfer".
 						} else if (bufer.substr(0,8) == "transfer") {
 							string numar_card_transfer = bufer.substr(9,6);
 
@@ -510,10 +506,10 @@ int main(int argc, char *argv[]) {
 							if (exista_card == data_users.end()) {
 								n = send(i, "IBANK> -4 : Numar card inexistent", BUFLEN, 0);
 								if (n < 0) {
-                	cout << "-10 : Eroare la apel send" << endl;
+                							cout << "-10 : Eroare la apel send" << endl;
 									exit(6);
-                }
-								// Cazul cand cardul exista.
+                						}
+							// Cazul cand cardul exista.
 							} else {
 								double suma = stod(bufer.substr(16, bufer.length() - 16));
 								stringstream stream;
@@ -528,7 +524,7 @@ int main(int argc, char *argv[]) {
 											cout << "-10 : Eroare la apel send" << endl;
 											exit(6);
 										}
-										// Cazul cand cardul exita si sunt destule fonduri.
+									// Cazul cand cardul exita si sunt destule fonduri.
 									} else {
 										Cerere_transfer aux;
 										aux.suma = suma;
@@ -549,8 +545,8 @@ int main(int argc, char *argv[]) {
 								}
 							}
 
-							// Cazul cand se primeste raspunsul pentru confirmarea unui
-							// transfer.
+						// Cazul cand se primeste raspunsul pentru confirmarea unui
+						// transfer.
 						} else {
 							auto cerere_tr = cereri_transfer.find(i);
 							if (cerere_tr != cereri_transfer.end()) {
@@ -566,7 +562,7 @@ int main(int argc, char *argv[]) {
 										cout << "-10 : Eroare la apel send" << endl;
 										exit(6);
 									}
-									// Daca raspunsul este orice altceva.
+								// Daca raspunsul este orice altceva.
 								} else {
 									n = send(i, "IBANK> -9 : Operatie anulata", BUFLEN, 0);
 									if (n < 0) {
@@ -576,11 +572,11 @@ int main(int argc, char *argv[]) {
 								}
 							}
 						}
-          }
+          				}
 				}
 			}
 		}
-  }
+  	}
 	close(sockfd);
 	return 0;
 }
